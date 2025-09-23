@@ -1,0 +1,5 @@
+# Environment variables (contains sensitive data)
+.env
+
+# Deploy script (may contain sensitive configuration)
+deploy_local.ps1
