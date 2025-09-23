@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://yourdomain.com/sitemap.xml
+
+# Allow all search engines to crawl the site
+# Disallow any sensitive directories if needed
+# Disallow: /private/
+# Disallow: /temp/
+
+# Crawl-delay for respectful crawling (optional)
+# Crawl-delay: 1

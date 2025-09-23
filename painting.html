@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Emma Genthon's Visual Art & Painting - Self-taught artist exploring the intersection of technology and traditional art.">
+    <meta name="keywords" content="Emma Genthon, M-A, painting, visual art, self-taught artist, analog art, mixed media">
+    <meta name="author" content="Emma Genthon">
+    <meta property="og:title" content="Visual Art & Painting - Emma Genthon">
+    <meta property="og:description" content="Self-taught visual artist creating works that blend traditional techniques with contemporary themes.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="images/general_banger.png">
+    <title>Painting & Visual Art - Emma Genthon | M-A Official</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Montserrat:wght@300;400;500&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="lateral-bar">
+        <span class="lateral-text">M-A</span>
+    </div>
+    <header>
+        <button id="menu-toggle" class="menu-toggle" aria-label="Open menu" aria-expanded="false">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="music.html">Music</a></li>
+                <li><a href="painting.html" class="active">Painting</a></li>
+                <li><a href="ai.html">AI</a></li>
+                <li><a href="about.html">About Me</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section id="painting" class="tab-content">
+            <h2>Artistic Work</h2>
+            <div class="gallery-container">
+                <div class="alternating-gallery" id="paintings-gallery">
+                    <!-- Paintings with descriptions will be loaded here via JavaScript -->
+                </div>
+            </div>
+        </section>
+        
+    </main>
+    
+    <!-- Lightbox for image gallery -->
+    <div class="lightbox" id="lightbox">
+        <div class="lightbox-close" id="lightbox-close">&times;</div>
+        <div class="lightbox-nav">
+            <button id="prev-btn">&lt;</button>
+            <button id="next-btn">&gt;</button>
+        </div>
+        <div class="lightbox-content">
+            <img src="" alt="" class="lightbox-img" id="lightbox-img">
+            <div class="lightbox-caption" id="lightbox-caption">
+                <h3 id="lightbox-title"></h3>
+                <p id="lightbox-description"></p>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script-multipage.js"></script>
+</body>
+</html>
