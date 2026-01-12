@@ -1,26 +1,30 @@
 <!DOCTYPE html>
+<meta name="google-site-verification" content="9Q-6OelpWa0YMrr7Qb0GmRI-4ZLX131gqudDcgJ-Knk" />
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Emma Genthon's Visual Art & Painting - Self-taught artist exploring the intersection of technology and traditional art.">
-    <meta name="keywords" content="Emma Genthon, M-A, painting, visual art, self-taught artist, analog art, mixed media">
+    <meta name="description" content="Portfolio of Emma Genthon (M-A), AI Engineer specializing in LLMs, RAG and AI deployment on Azure. Research at CNRS on LLMs (quantization, PEFT) and artistic projects mixing AI, music and painting.">
+    <meta name="keywords" content="M-A, Emma Genthon, artist, M-A, music, painting, AI Engineer, LLMs, RAG, Azure, CNRS, quantization, PEFT">
     <meta name="author" content="Emma Genthon">
-    <meta property="og:title" content="Visual Art & Painting - Emma Genthon">
-    <meta property="og:description" content="Self-taught visual artist creating works that blend traditional techniques with contemporary themes.">
+    <meta property="og:title" content="Emma Genthon - AI Engineer & Artist">
+    <meta property="og:description" content="Portfolio of Emma Genthon (M-A), an Artist and AI Engineer specializing in LLMs, RAG and AI deployment on Azure. Research at CNRS on LLMs (quantization, PEFT) and artistic projects mixing AI, music and painting.">
     <meta property="og:type" content="website">
     <meta property="og:image" content="images/general_banger.png">
-    <title>Painting & Visual Art - Emma Genthon | M-A Official</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Emma Genthon - AI Engineer & Artist">
+    <meta name="twitter:description" content="Artist and AI Engineer specializing in LLMs, RAG and Azure deployment.">
+    <title>Emma Genthon - AI Engineer & Artist | M-A Official</title>
+    <link rel="stylesheet" href="style.css">    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Montserrat:wght@300;400;500&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
-</head>
+    </head>
 <body>
     <div class="lateral-bar">
         <span class="lateral-text">M-A</span>
     </div>
     <header>
+        <!-- Mobile menu toggle added for small screens -->
         <button id="menu-toggle" class="menu-toggle" aria-label="Open menu" aria-expanded="false">
             <span class="bar"></span>
             <span class="bar"></span>
@@ -37,7 +41,7 @@
         </nav>
     </header>
     <main>
-        <section id="painting" class="tab-content">
+        <section id="painting" class="tab-content active">
             <h2>Artistic Work</h2>
             <div class="gallery-container">
                 <div class="alternating-gallery" id="paintings-gallery">
@@ -45,25 +49,7 @@
                 </div>
             </div>
         </section>
-        
     </main>
-    
-    <!-- Lightbox for image gallery -->
-    <div class="lightbox" id="lightbox">
-        <div class="lightbox-close" id="lightbox-close">&times;</div>
-        <div class="lightbox-nav">
-            <button id="prev-btn">&lt;</button>
-            <button id="next-btn">&gt;</button>
-        </div>
-        <div class="lightbox-content">
-            <img src="" alt="" class="lightbox-img" id="lightbox-img">
-            <div class="lightbox-caption" id="lightbox-caption">
-                <h3 id="lightbox-title"></h3>
-                <p id="lightbox-description"></p>
-            </div>
-        </div>
-    </div>
-    
     <script src="script-multipage.js"></script>
 </body>
 </html>
