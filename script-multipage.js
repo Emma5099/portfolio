@@ -1,919 +1,424 @@
-// ========== Hinge Analysis Upload & Results ========== //
-// Respect user preference for reduced motion globally
-const PREFERS_REDUCED_MOTION = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-if (PREFERS_REDUCED_MOTION) {
-    document.documentElement.classList.add('reduced-motion');
-}
-// Helper: try alternate extension casing if an image fails to load (handles .jpg vs .JPG on Linux)
-function getAltFilename(filename) {
-    if (!filename) return null;
-    if (/\.jpg$/i.test(filename)) {
-        return filename.endsWith('.jpg') ? filename.replace(/\.jpg$/, '.JPG') : filename.replace(/\.JPG$/, '.jpg');
-    }
-    return null;
-}
-
-function setImageWithFallback(imgEl, filename) {
-    if (!imgEl || !filename) return;
-    const base = `paintings/${filename}`;
-    imgEl.src = base;
-    imgEl.onerror = function() {
-        const alt = getAltFilename(filename);
-        if (alt) {
-            // prevent infinite loop
-            imgEl.onerror = null;
-            imgEl.src = `paintings/${alt}`;
-        }
-    };
-}
-document.addEventListener('DOMContentLoaded', () => {
-    // Hint the browser to prepare compositing layers for frequently-animated elements
-    try {
-        const hotEls = document.querySelectorAll('.home-image, .painting-image img, .lightbox-img, .scroll-indicator');
-        hotEls.forEach(el => {
-            // set via style to avoid reflow via CSS rule changes
-            if (!PREFERS_REDUCED_MOTION) el.style.willChange = 'transform, opacity';
-        });
-    } catch (e) {
-        // silent
-    }
-    // ...existing code...
-
-    // Hinge sub-tab logic
-    const hingeDropArea = document.getElementById('hinge-drop-area');
-    const hingeFileInput = document.getElementById('hinge-file-input');
-    const hingeStatus = document.getElementById('hinge-upload-status');
-    const hingeResults = document.getElementById('hinge-analysis-results');
-
-    if (hingeDropArea && hingeFileInput) {
-        // Drag & drop events
-        ['dragenter', 'dragover'].forEach(eventName => {
-            hingeDropArea.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                hingeDropArea.classList.add('dragover');
-            });
-        });
-        ['dragleave', 'drop'].forEach(eventName => {
-            hingeDropArea.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                hingeDropArea.classList.remove('dragover');
-            });
-        });
-        hingeDropArea.addEventListener('click', () => hingeFileInput.click());
-        hingeDropArea.addEventListener('drop', (e) => {
-            const files = e.dataTransfer.files;
-            if (files && files.length > 0) {
-                handleHingeFile(files[0]);
-            }
-        });
-        hingeFileInput.addEventListener('change', (e) => {
-            if (hingeFileInput.files && hingeFileInput.files.length > 0) {
-                handleHingeFile(hingeFileInput.files[0]);
-            }
-        });
-    }
-
-
-    // Set your FastAPI backend URL here (change port if needed)
-    const API_BASE = "http://localhost:8000";
-
-    function handleHingeFile(file) {
-        if (!file || file.name !== 'matches.json') {
-            hingeStatus.textContent = 'Please upload a file named matches.json.';
-            return;
-        }
-        hingeStatus.textContent = 'Uploading...';
-        const formData = new FormData();
-        formData.append('file', file);
-        fetch(`${API_BASE}/upload_hinge`, {
-            method: 'POST',
-            body: formData
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                hingeStatus.textContent = 'File uploaded. Running analysis...';
-                pollHingeResults();
-            } else {
-                hingeStatus.textContent = data.error || 'Upload failed.';
-            }
-        })
-        .catch(() => {
-            hingeStatus.textContent = 'Upload failed.';
-        });
-    }
-
-    // Poll for results (images)
-    function pollHingeResults() {
-        hingeResults.innerHTML = '';
-        let attempts = 0;
-        const maxAttempts = 30;
-        const poll = () => {
-            fetch(`${API_BASE}/hinge_results.json?_=` + Date.now())
-                .then(res => res.json())
-                .then(data => {
-                    if (data && data.plots && data.plots.length > 0) {
-                        hingeStatus.textContent = '';
-                        renderHingePlots(data.plots);
-                    } else if (attempts < maxAttempts) {
-                        attempts++;
-                        setTimeout(poll, 1500);
-                    } else {
-                        hingeStatus.textContent = 'Analysis timed out.';
-                    }
-                })
-                .catch(() => {
-                    if (attempts < maxAttempts) {
-                        attempts++;
-                        setTimeout(poll, 1500);
-                    } else {
-                        hingeStatus.textContent = 'Analysis timed out.';
-                    }
-                });
-        };
-        poll();
-    }
-
-    function renderHingePlots(plots) {
-        hingeResults.innerHTML = '';
-        // Create a minimalist grid container
-        const grid = document.createElement('div');
-        grid.className = 'hinge-plots-grid';
-        plots.forEach(plot => {
-            const item = document.createElement('div');
-            item.className = 'hinge-plot-item';
-
-            const img = document.createElement('img');
-            let imgUrl = plot.url;
-            if (!/^https?:\/\//i.test(imgUrl)) {
-                imgUrl = API_BASE + imgUrl;
-            }
-            img.src = imgUrl;
-            img.alt = plot.caption || 'Hinge analysis plot';
-            img.loading = 'lazy';
-            img.className = 'hinge-plot-img';
-            // Fade-in effect on load
-            img.style.opacity = '0';
-            img.onload = () => { img.style.opacity = '1'; };
-
-            item.appendChild(img);
-            if (plot.caption) {
-                const cap = document.createElement('div');
-                cap.className = 'hinge-plot-caption';
-                cap.textContent = plot.caption;
-                item.appendChild(cap);
-            }
-            grid.appendChild(item);
-        });
-        hingeResults.appendChild(grid);
-    }
-    
-    // Always scroll to top on reload (including bfcache restores)
-    window.scrollTo(0, 0);
-    window.addEventListener('pageshow', function(event) {
-        if (event.persisted) {
-            window.scrollTo(0, 0);
-        }
-    });
-    
-    // Update tab and sub-tab logic for new tab structure
-    const tabs = document.querySelectorAll('nav a[data-tab]');
-    const tabContents = document.querySelectorAll('.tab-content');
-
-    // Enhanced tab switching with smooth transitions
-    tabs.forEach(tab => {
-        tab.addEventListener('click', (e) => {
-            e.preventDefault();
-            
-            // Get target tab
-            const targetTab = tab.getAttribute('data-tab');
-            
-            // Scroll to top smoothly when switching tabs
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            
-            // Update active class on tabs
-            tabs.forEach(t => t.classList.remove('active'));
-            tab.classList.add('active');
-            
-            // Show/hide tab contents with smooth transitions
-            tabContents.forEach(content => {
-                if (content.id === targetTab) {
-                    content.classList.add('active');
-                    content.style.display = 'block';
-                    // Trigger a reflow to ensure the display change takes effect
-                    content.offsetHeight;
-                    content.style.opacity = '1';
-                } else {
-                    content.classList.remove('active');
-                    content.style.opacity = '0';
-                    // Hide after transition completes
-                    setTimeout(() => {
-                        if (!content.classList.contains('active')) {
-                            content.style.display = 'none';
-                        }
-                    }, 300);
-                }
-            });
-            
-            // Cancel any ongoing animations when switching tabs
-            if (window.currentScrollAnimation) {
-                cancelAnimationFrame(window.currentScrollAnimation);
-            }
-            
-            // Clear any animation-related classes from body
-            document.body.classList.remove('is-scrolling', 'scroll-complete');
-            document.documentElement.classList.remove('smooth-scroll-active');
-            
-            // Special handling for home tab animations
-            if (targetTab === 'home') {
-                setTimeout(() => {
-                    setupHomeAnimation();
-                }, 150);
-            }
-            
-            // Special handling for paintings gallery  
-            if (targetTab === 'paintings') {
-                setTimeout(() => {
-                    loadPaintingsGallery();
-                }, 150);
-            }
-        });
-    });
-
-    // Mobile menu toggle behavior
-    const menuToggle = document.getElementById('menu-toggle');
-    const navEl = document.querySelector('header nav');
-    
-    // Ensure menu is hidden by default when page loads
-    if (navEl) {
-        navEl.classList.remove('open');
-    }
-    if (menuToggle) {
-        menuToggle.classList.remove('open');
-        menuToggle.setAttribute('aria-expanded', 'false');
-        
-        // Only toggle menu when button is clicked
-        menuToggle.addEventListener('click', () => {
-            const isOpen = menuToggle.classList.toggle('open');
-            if (isOpen) {
-                navEl.classList.add('open');
-                menuToggle.setAttribute('aria-expanded', 'true');
-                // Prevent background scroll when menu is open
-                document.body.style.overflow = 'hidden';
-            } else {
-                navEl.classList.remove('open');
-                menuToggle.setAttribute('aria-expanded', 'false');
-                document.body.style.overflow = '';
-            }
-        });
-
-        // Close menu when a nav link is clicked
-        navEl.querySelectorAll('a').forEach(a => {
-            a.addEventListener('click', () => {
-                if (menuToggle.classList.contains('open')) {
-                    menuToggle.classList.remove('open');
-                    navEl.classList.remove('open');
-                    menuToggle.setAttribute('aria-expanded', 'false');
-                    document.body.style.overflow = '';
-                }
-            });
-        });
-    }
-
-    // Only for closing with Escape key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && menuToggle && menuToggle.classList.contains('open')) {
-            menuToggle.classList.remove('open');
-            navEl.classList.remove('open');
-            menuToggle.setAttribute('aria-expanded', 'false');
-            document.body.style.overflow = '';
-        }
-    });
-
-    // Set active navigation based on current page
-    function setActiveNavigation() {
-        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-        const navLinks = document.querySelectorAll('nav a');
-        
-        navLinks.forEach(link => {
-            link.classList.remove('active');
-            const linkPage = link.getAttribute('href');
-            
-            if (linkPage === currentPage || 
-                (currentPage === '' && linkPage === 'index.html') ||
-                (currentPage === 'index.html' && linkPage === 'index.html')) {
-                link.classList.add('active');
-            }
-        });
-    }
-
-    // Call on page load
-    setActiveNavigation();
-
-    
-    // Set up the home page animation
-    setupHomeAnimation();
-    
-    // Load paintings for the gallery
-    loadPaintingsGallery();    // Function to set up the home page animation
-    function setupHomeAnimation() {
-        const homeTab = document.getElementById('home');
-        if (homeTab) {
-            // Make sure it's active
-            homeTab.classList.add('active');
-            
-            // Scroll to top of page initially
-            window.scrollTo(0, 0);
-            
-            // Add animation class to home tab
-            homeTab.classList.add('animate-in');
-            
-            const homeImage = homeTab.querySelector('.home-image');
-            const homeIntro = homeTab.querySelector('.home-intro');
-            const scrollIndicator = homeTab.querySelector('.scroll-indicator');
-            
-            if (scrollIndicator) {
-                // Add animated class to scroll indicator for initial animation
-                scrollIndicator.classList.add('animated');
-            }
-              if (homeImage && homeIntro) {
-                // Prepare smooth animations 
-                // Create a unified animation sequence function to handle both cases
-                function startAnimationSequence() {
-                    // First ensure we're at the very top of the page
-                    window.scrollTo(0, 0);
-
-                    // Show hero image immediately
-                    homeImage.classList.add('animate-loaded');
-
-                    // Reveal the scroll indicator with subtle timing (skip when reduced-motion)
-                    if (scrollIndicator && !PREFERS_REDUCED_MOTION) {
-                        setTimeout(() => {
-                            scrollIndicator.style.opacity = '0';
-                            scrollIndicator.classList.add('animated');
-                        }, 1200);
-                    }
-
-                    // If user prefers reduced motion, reveal intro without auto-scrolling
-                    if (PREFERS_REDUCED_MOTION) {
-                        if (homeIntro) {
-                            homeIntro.classList.add('fully-visible', 'animate-in');
-                            homeIntro.querySelectorAll('.intro-content > *').forEach(el => el.classList.add('animate-in'));
-                        }
-                        if (scrollIndicator) {
-                            scrollIndicator.classList.add('fade-out');
-                            setTimeout(() => { scrollIndicator.style.display = 'none'; }, 300);
-                        }
-                        return;
-                    }
-
-                    // Stay on the main picture briefly, then scroll to intro with gentler timing
-                    setTimeout(() => {
-                        smoothScrollToIntro(1400);
-                    }, 1600);
-                }
-                
-                // Listen for image load event
-                homeImage.onload = function() {
-                    startAnimationSequence();
-                };                // If the image is already loaded (from cache)
-                if (homeImage.complete) {
-                    startAnimationSequence();
-                }// Enhanced smooth scroll function for more fluid animation
-                function customSmoothScroll(targetY, duration) {
-                    const startingY = window.pageYOffset;
-                    const diff = targetY - startingY;
-                    let start;
-                    let done = false;
-
-                    // Classic easeInOutCubic for ultra-smooth feel
-                    // Smoother easing using sine for very soft start/stop
-                    function easeInOutSine(t) {
-                        return -(Math.cos(Math.PI * t) - 1) / 2;
-                    }
-
-                    // Callback for when the scroll is complete
-                    function onScrollComplete() {
-                        const scrollIndicator = document.querySelector('.scroll-indicator');
-                        if (scrollIndicator) {
-                            scrollIndicator.classList.add('fade-out');
-                            setTimeout(() => {
-                                scrollIndicator.style.display = 'none';
-                            }, 500);
-                        }
-
-                        // Add animation to any elements that should animate once scrolling is complete
-                        const homeIntro = document.querySelector('.home-intro');
-                        if (homeIntro) {
-                            // Reveal intro content immediately after scroll completes (no stagger)
-                            homeIntro.classList.add('fully-visible');
-                            // Reveal other immediate intro children (e.g., heading, divider)
-                            const otherChildren = homeIntro.querySelectorAll('.intro-content > *:not(.portfolio-intro)');
-                            otherChildren.forEach((el) => {
-                                el.style.animationDelay = '0ms';
-                                el.classList.add('animate-in');
-                            });
-
-                            const portfolioIntro = homeIntro.querySelector('.portfolio-intro');
-                            if (portfolioIntro) {
-                                const introMain = portfolioIntro.querySelector('.intro-main');
-                                const introPersonal = portfolioIntro.querySelector('.intro-personal');
-                                // Reveal both pieces immediately (user requested text displayed after scroll)
-                                if (introMain) {
-                                    introMain.style.animationDelay = '0ms';
-                                    introMain.classList.add('animate-in');
-                                }
-                                if (introPersonal) {
-                                    introPersonal.style.animationDelay = '0ms';
-                                    introPersonal.classList.add('animate-in');
-                                }
-                            }
-                        }
-                    }
-
-                    // Cancel any existing animation for smoother transitions between animations
-                    if (window.currentScrollAnimation) {
-                        cancelAnimationFrame(window.currentScrollAnimation);
-                    }
-
-                    window.customSmoothScroll = customSmoothScroll;
-
-                    function step(timestamp) {
-                        if (!start) start = timestamp;
-                        const elapsed = timestamp - start;
-                        const percent = Math.min(elapsed / duration, 1);
-                        const easedPercent = easeInOutSine(percent);
-                        const nextY = startingY + diff * easedPercent;
-                        window.scrollTo({
-                            top: nextY,
-                            behavior: 'auto'
-                        });
-                        if (percent < 1) {
-                            window.currentScrollAnimation = requestAnimationFrame(step);
-                        } else if (!done) {
-                            done = true;
-                            onScrollComplete();
-                        }
-                    }
-                    window.currentScrollAnimation = requestAnimationFrame(step);
-                }                  // Enhanced smoothScrollToIntro with improved timing and effects
-                function smoothScrollToIntro(duration = 1500) {
-                    const homeIntro = document.querySelector('.home-intro');
-                    if (homeIntro) {
-                        // Add classes to enable animation effects
-                        document.body.classList.add('is-scrolling');
-                        document.documentElement.classList.add('smooth-scroll-active');
-                        
-                        // Calculate ideal scroll position with more precision
-                        const introRect = homeIntro.getBoundingClientRect();
-                        const introPosition = introRect.top + window.pageYOffset;
-                                  // Calculate position to completely hide the image
-                        const viewportHeight = window.innerHeight;
-                        const introHeight = introRect.height;
-                        
-                        // Create a small offset to ensure the intro sits nicely in view
-                        const optimalOffset = viewportHeight * 0.02; // small buffer at the top (2% of viewport)
-                        // Add a little extra downward scroll so the page moves a bit more down
-                        const extraScroll = Math.round(viewportHeight * 0.06); // ~6% of viewport
-                        let targetScrollPosition = introPosition - optimalOffset + extraScroll;
-                        // Clamp target to valid scroll range
-                        const maxScroll = Math.max(0, document.body.scrollHeight - window.innerHeight);
-                        targetScrollPosition = Math.min(Math.max(0, targetScrollPosition), maxScroll);
-                        
-                        // Apply the smooth scroll with optimized duration
-                        // Longer duration for larger scroll distances feels more natural
-                        const scrollDistance = Math.abs(window.pageYOffset - targetScrollPosition);
-                        // If caller provided explicit duration, use it; otherwise compute dynamic duration
-                        let dynamicDuration = duration;
-                        if (typeof duration !== 'number') {
-                            const baseDuration = 1200;
-                            dynamicDuration = Math.max(900, Math.min(3200, baseDuration + (scrollDistance / 2.5)));
-                        }
-
-                        // Execute the enhanced smooth scroll
-                        customSmoothScroll(targetScrollPosition, dynamicDuration);
-                        
-                        // Add subtle animation effects
-                        const heroImage = document.querySelector('.home-image');
-                        if (heroImage) {
-                            heroImage.classList.add('scrolling-active');
-                        }
-                        
-                        // Reset scrolling class with a buffer after animation completes
-                        setTimeout(() => {
-                            document.body.classList.remove('is-scrolling');
-                            document.documentElement.classList.remove('smooth-scroll-active');
-                            
-                            // Add complete class to enable post-scroll animations
-                            document.body.classList.add('scroll-complete');
-                        }, dynamicDuration);
-                    }
-                }
-            }
-        }
-    }
-
-    
-    // Handle window resize and scroll to ensure content visibility
-    window.addEventListener('resize', function() {
-        // If home tab is active, ensure it's visible
-        const homeTab = document.getElementById('home');
-        if (homeTab && homeTab.classList.contains('active')) {
-            ensureHomeTabVisibility();
-        }
-    });
-
-    // Handle hash changes for direct navigation
-    window.addEventListener('hashchange', function() {
-        const hash = window.location.hash;
-        if (hash === '#home' || hash === '') {
-            // Make sure we start at the top when navigating via hash
-            window.scrollTo({ top: 0, behavior: 'auto' });
-            ensureHomeTabVisibility();
-        }
-    });
-
-    // Initial check for hash on page load
-    if (window.location.hash === '#home' || window.location.hash === '') {
-        setTimeout(ensureHomeTabVisibility, 100); // Small delay for browser rendering
-    }
-
-    // Initialize the first active tab if none is set
-    const activeTab = document.querySelector('nav a[data-tab].active');
-    if (!activeTab && tabs.length > 0) {
-        tabs[0].click(); // Activate the first tab by default
-    }
-});
-
-// Array of painting data with filenames and descriptions
+// ── Paintings data ────────────────────────────────────────────────────
 const paintingsData = [
+    {
+        filename: 'ai/Adversarial.png',
+        title: 'The Worst Part of Internet',
+        description: "I fine-tuned a LLM on <strong>racist and sexist reddit posts and tweets</strong>, basically the <strong>worst part of the internet</strong>. <br> <br>I then asked the model <i>'What do you think about this <strong>Black woman</strong></i> I've painted?'  <br> <br>  The answers are in the background. Behind this painting, I wanted to show that AI is not the bad guy, the wrong choice is. This works shows the importance of the data selection and the fact that 'AI' does not reflect (or does it?) human intelligence.<br><br>The whole process is described in the tab 'articles'.",
+        technic: "Acrylic on canvas. Fine-tuning of a Mistral model with a LoRA.",
+        noPrefix: true,
+        small: true 
+    },
+    {
+        filename: 'ai/Lookatme.png',
+        title: 'Look at Me',
+        description: "I fine-tuned a model only on instagram captions and asked to generate a lot of samples to understand the general topics people were posting about. <br> <br> Roughly 3/10 Instagram captions were about beauty, makeup, and outfits — 1/10 mentioned the Kardashians. I imagined the person who would post them.",
+        technic: "Acrylic on canvas. Fine-tuning of a Mistral model with a LoRA.",
+        noPrefix: true,
+        small: true
+    },
+    {
+        filename: 'ai/Kids.png',
+        title: 'Kids',
+        description: "I fine-tuned a model only on instagram captions and asked to generate a lot of samples to understand the general topics people were posting about. <br> <br> Roughly 3/10 captions were about children. So many kids are exposed online — I wanted to make that visible.",
+        technic: "Acrylic on canvas. Fine-tuning of a Mistral model with a LoRA.",
+        noPrefix: true,
+        small: true
+    },
+    {
+        filename: 'ai/Bland.png',
+        title: 'Bland',
+        description: "I fine-tuned a model only on instagram captions and asked to generate a lot of samples to understand the general topics people were posting about. <br> <br> Roughly 3/10 captions were neutral and barely personal — 'made me smile…', '2017…', 'Wednesday night': so yeah, we are bland.",
+        technic: "Acrylic on canvas. Fine-tuning of a Mistral model with a LoRA.",
+        noPrefix: true,
+        small: true
+    },
     {
         filename: 'image3.jpg',
         title: 'Chromatic Journey',
-        description: "I've always found vermilion to be such a deep and amazing color (it was my favorite in my first painting kit in primary school). I painted two canvases using this color scheme.",
+        description: "Two canvases built around vermilion — my favourite colour from my very first painting kit in primary school.",
         technic: "Marker on photo paper, Collage and Acrylic on canvas."
     },
     {
         filename: 'image4.jpg',
         title: 'Stuck',
-        description: "Painted in the same period as my EP. A depiction of feeling trapped or immobilized, like in a bad relationship.",
+        description: "Painted in the same period as my EP. A depiction of feeling trapped or immobilized — like in a bad relationship.",
         technic: "Acrylic & Markers on canvas."
     },
     {
         filename: 'image1.jpg',
         title: 'Ghost',
-        description: "A ghostly figure, drawn from and titled after my song 'Ghost'. \n Graphite pencil, Wax pencil and charcoal",
-        technic: "Graphite pencil, Wax pencil and charcoal"
+        description: "A ghostly figure drawn from — and titled after — my song 'Ghost'.",
+        technic: "Graphite pencil, Wax pencil and Charcoal."
+    },
+    {
+        filename: 'image8.jpg',
+        title: 'Shit Happens to Everyone, No Worries',
+        description: "An old man and a young girl in the rain. Whether you are young or old, shit still happens.",
+        technic: "Acrylic on canvas."
     },
     {
         filename: 'photo10.JPG',
         title: 'Media Women',
-        description: 'How women are actually portrayed in media (still in 2025). \n Acrylic on canvas.',
-        technic: "Acrylic on canvas."
-    },
-    {
-        filename: 'image8.jpg',
-        title: 'Shit happens to everyone, no worries',
-        description: "An old man and a young girl in the rain. Whether you are young or old, well shit still happens. \n Acrylic on canvas.",
+        description: "I painted the way women are portrayed in media in general.",
         technic: "Acrylic on canvas."
     }
 ];
 
-// Function to load paintings from the paintings folder with alternating layout
-function loadPaintingsGallery() {
-    const galleryElement = document.getElementById('paintings-gallery');
-    if (!galleryElement) return;
+// ── Dark / light sections ─────────────────────────────────────────────
+const darkTabs  = new Set(['home', 'about', 'ai-art', 'music']);
+const lightTabs = new Set(['paint', 'articles']);
 
-    // Extract just the filenames for the lightbox functionality
-    const paintingsFiles = paintingsData.map(painting => painting.filename);
+// ── DOM ready ─────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
 
-    // Clear any existing content
-    galleryElement.innerHTML = '';
+    const body     = document.getElementById('body');
+    const tabs     = document.querySelectorAll('nav a[data-tab]');
+    const sections = document.querySelectorAll('.tab-content');
+    const menuBtn  = document.getElementById('menu-toggle');
+    const nav      = document.querySelector('nav');
 
-    // Create and append alternating gallery rows
-    paintingsData.forEach((painting, index) => {
-        const rowElement = document.createElement('div');
-        rowElement.className = `painting-row ${index % 2 === 0 ? 'left-image' : 'right-image'}`;
-        
-        // Create image container
-        const imageContainer = document.createElement('div');
-        imageContainer.className = 'painting-image';
-        
-    const img = document.createElement('img');
-    setImageWithFallback(img, painting.filename);
-        img.alt = painting.title;
-        img.loading = 'lazy'; // Lazy loading for better performance
-        img.dataset.index = index;
-        
-        // Add click event to open lightbox
-        img.addEventListener('click', () => {
-            openLightbox(index, paintingsFiles);
-        });
-        
-        imageContainer.appendChild(img);
-        
-        // Create description container
-        const descriptionContainer = document.createElement('div');
-        descriptionContainer.className = 'painting-description';
-        
-        const title = document.createElement('h3');
-        title.textContent = painting.title;
-        
-        const description = document.createElement('p');
-        description.textContent = painting.description;
-        
-        // Add technique in italics
-        const technique = document.createElement('p');
-        technique.className = 'painting-technique';
-        technique.innerHTML = `<em>${painting.technic}</em>`;
-        
-        descriptionContainer.appendChild(title);
-        descriptionContainer.appendChild(description);
-        descriptionContainer.appendChild(technique);
-        
-        // Append image and description to the row
-        rowElement.appendChild(imageContainer);
-        rowElement.appendChild(descriptionContainer);
-        
-        // Append row to the gallery
-        galleryElement.appendChild(rowElement);
-    });
-
-    // Set up lightbox functionality
-    setupLightbox(paintingsFiles);
-}
-
-// Current index for lightbox navigation
-let currentIndex = 0;
-
-// Function to set up lightbox
-function setupLightbox(images) {
-    const lightbox = document.getElementById('lightbox');
-    const lightboxImg = document.getElementById('lightbox-img');
-    const closeBtn = document.getElementById('lightbox-close');
-    const prevBtn = document.getElementById('prev-btn');
-    const nextBtn = document.getElementById('next-btn');
-    
-    // Close lightbox
-    closeBtn.addEventListener('click', () => {
-        lightbox.classList.remove('active');
-    });
-    
-    // Close on click outside the image
-    lightbox.addEventListener('click', (e) => {
-        if (e.target === lightbox) {
-            lightbox.classList.remove('active');
-        }
-    });
-      // Navigate to previous image
-    prevBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        currentIndex = (currentIndex - 1 + images.length) % images.length;
-        updateLightboxContent(currentIndex, images);
-    });
-    
-    // Navigate to next image
-    nextBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        currentIndex = (currentIndex + 1) % images.length;
-        updateLightboxContent(currentIndex, images);
-    });
-    
-    // Helper function to update lightbox content
-    function updateLightboxContent(index, images) {
-        const lightboxImg = document.getElementById('lightbox-img');
-        const lightboxTitle = document.getElementById('lightbox-title');
-        const lightboxDescription = document.getElementById('lightbox-description');
-        
-        setImageWithFallback(lightboxImg, images[index]);
-        
-        // Get painting data based on current index
-        const paintingData = paintingsData[index];
-        
-        if (paintingData) {
-            lightboxImg.alt = paintingData.title;
-            lightboxTitle.textContent = paintingData.title;
-            
-            // Update description to include technique in italics
-            lightboxDescription.innerHTML = `${paintingData.description}<br><br><em>${paintingData.technic}</em>`;
+    // ── Theme helper ──────────────────────────────────────────────────
+    function setTheme(tabId) {
+        if (lightTabs.has(tabId)) {
+            body.classList.remove('dark-theme');
+            body.classList.add('light-theme');
         } else {
-            lightboxImg.alt = `Painting ${index + 1}`;
-            lightboxTitle.textContent = `Painting ${index + 1}`;
-            lightboxDescription.textContent = '';
+            body.classList.remove('light-theme');
+            body.classList.add('dark-theme');
         }
+        body.classList.toggle('paint-tab', tabId === 'paint');
     }
-    
-    // Keyboard navigation
-    document.addEventListener('keydown', (e) => {
-        if (!lightbox.classList.contains('active')) return;
-        
-        switch(e.key) {
-            case 'Escape':
-                lightbox.classList.remove('active');
-                break;
-            case 'ArrowLeft':
-                prevBtn.click();
-                break;
-            case 'ArrowRight':
-                nextBtn.click();
-                break;
+
+    // ── Tab activation ────────────────────────────────────────────────
+    let isTransitioning = false;
+
+    function showSection(targetId) {
+        const next = document.getElementById(targetId);
+        if (!next) return;
+        next.classList.add('active');
+        next.style.display = 'block';
+        if (targetId === 'paint') buildPaintingsGrid();
+        if (targetId === 'about') buildAsciiArt();
+        // One rAF to paint display:block, then fade in + reveal
+        requestAnimationFrame(() => {
+            next.classList.add('tab-visible');
+            isTransitioning = false;
+            setTimeout(() => observeReveals(next), 80);
+        });
+    }
+
+    function activateTab(targetId, pushState = true) {
+        if (isTransitioning) return;
+
+        const current = document.querySelector('.tab-content.tab-visible');
+        if (current && current.id === targetId) return;
+
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === targetId));
+        setTheme(targetId);
+        if (pushState) history.pushState({ tab: targetId }, '', `#${targetId}`);
+        nav.classList.remove('open');
+        menuBtn.classList.remove('open');
+        menuBtn.setAttribute('aria-expanded', 'false');
+
+        if (!current) {
+            // First load — no outgoing transition
+            showSection(targetId);
+            return;
+        }
+
+        isTransitioning = true;
+        current.classList.remove('tab-visible');
+        setTimeout(() => {
+            current.style.display = 'none';
+            current.classList.remove('active');
+            showSection(targetId);
+        }, 320);
+    }
+
+    // ── Nav click events ──────────────────────────────────────────────
+    tabs.forEach(tab => {
+        tab.addEventListener('click', e => {
+            e.preventDefault();
+            activateTab(tab.dataset.tab);
+        });
+    });
+
+    // ── Handle back/forward ───────────────────────────────────────────
+    window.addEventListener('popstate', e => {
+        const tabId = (e.state && e.state.tab) || 'home';
+        activateTab(tabId, false);
+    });
+
+    // ── Logo / brand click → home ─────────────────────────────────────
+    document.addEventListener('click', e => {
+        if (e.target.closest('header') && !e.target.closest('nav') && !e.target.closest('.menu-toggle')) {
+            activateTab('home');
         }
     });
-}
 
-// Function to open lightbox with specific image
-function openLightbox(index, images) {
-    const lightbox = document.getElementById('lightbox');
-    
-    currentIndex = index;
-    updateLightboxContent(index, images);
-    
-    lightbox.classList.add('active');
-}
+    // ── Hamburger toggle ──────────────────────────────────────────────
+    menuBtn.addEventListener('click', () => {
+        const isOpen = menuBtn.classList.toggle('open');
+        nav.classList.toggle('open', isOpen);
+        menuBtn.setAttribute('aria-expanded', isOpen);
+    });
 
-// Fixing missing function reference
-function ensureHomeTabVisibility() {
-    // Expose custom smooth scroll function globally
-    window.customSmoothScroll = function(targetY, duration) {
-        const startingY = window.pageYOffset;
-        const diff = targetY - startingY;
-        let start;
-        
-        // Smoother easing using sine for very soft start/stop
-        function easeInOutSine(t) {
-            return -(Math.cos(Math.PI * t) - 1) / 2;
-        }
-        
-        window.requestAnimationFrame(function step(timestamp) {
-            if (!start) start = timestamp;
-            
-            // Calculate progress
-            const time = timestamp - start;
-            const percent = Math.min(time / duration, 1);
-            
-            // Apply easing
-            const easedPercent = easeInOutSine(percent);
-            
-            window.scrollTo(0, startingY + diff * easedPercent);
-            
-            // Continue animation if not complete
-            if (time < duration) {
-                window.requestAnimationFrame(step);
-            }
-        });
-    };
-    
-    const homeTab = document.getElementById('home');
-    if (homeTab) {
-        // Make sure it's active
-        homeTab.classList.add('active');
-        
-        // Scroll to top of page initially
-        window.scrollTo(0, 0);
-        
-        // Set a timeout for the scroll animation
-        setTimeout(() => {
-            const homeIntro = document.querySelector('.home-intro');
-                if (homeIntro) {
-                const introPosition = homeIntro.getBoundingClientRect().top + window.pageYOffset;
-                // Scroll slightly more down than before for better placement
-                const extra = Math.round(window.innerHeight * 0.06);
-                const maxScroll = Math.max(0, document.body.scrollHeight - window.innerHeight);
-                const targetPos = Math.min(Math.max(0, introPosition - 50 + extra), maxScroll);
-                window.customSmoothScroll(targetPos, 1500);
-            }
-        }, 1000);
-    }
-}    // Add additional animation effect functions
-    function addPageLoadAnimations() {
-        // Prepare smooth scrolling
-        document.documentElement.classList.add('smooth-scroll-active');
-        
-        // Add a class to the body to enable certain transition effects
-        document.body.classList.add('page-loaded');
-        
-        // Get home tab elements
-        const homeTab = document.getElementById('home');
-        if (!homeTab) return;
-        
-        const homeImage = homeTab.querySelector('.home-image');
-        const homeIntro = homeTab.querySelector('.home-intro');
-        const scrollIndicator = homeTab.querySelector('.scroll-indicator');
-        
-        // Make the scroll indicator visible and animated
-        if (scrollIndicator) {
-            setTimeout(() => {
-                scrollIndicator.classList.add('animated');
-            }, 1500);
-            
-            // Add click event to scroll indicator for user-initiated scroll
-            scrollIndicator.addEventListener('click', () => {
-                smoothScrollToIntro();
-            });
-        }
-        
-        // Preload hero image to ensure smooth animations
-        if (homeImage && homeImage.complete) {
-            homeImage.classList.add('animate-loaded');
-        } else if (homeImage) {
-            homeImage.onload = () => {
-                homeImage.classList.add('animate-loaded');
+    // ── Hash routing on load ──────────────────────────────────────────
+    const hash = window.location.hash.replace('#', '');
+    const validTabs = ['home', 'music', 'paint', 'ai-art', 'articles', 'about'];
+    const initial = validTabs.includes(hash) ? hash : 'paint';
+    activateTab(initial, false);
+
+    // ── Build alternating paintings gallery ───────────────────────────
+    function buildPaintingsGrid() {
+        const gallery = document.getElementById('paintings-gallery');
+        if (!gallery || gallery.children.length > 0) return;
+
+        paintingsData.forEach((p, i) => {
+            const row = document.createElement('div');
+            const revealDir = i % 2 === 0 ? 'reveal-left' : 'reveal-right';
+            row.className = `painting-row ${i % 2 === 0 ? 'left-image' : 'right-image'} ${revealDir}`;
+            row.style.transitionDelay = `${(i % 3) * 0.08}s`;
+
+            // Image side
+            const imgWrap = document.createElement('div');
+            imgWrap.className = p.small ? 'painting-image painting-image--small' : 'painting-image';
+
+            const img = document.createElement('img');
+            img.src = p.noPrefix ? p.filename : `paintings/${p.filename}`;
+            img.alt = p.title;
+            img.loading = 'lazy';
+            img.onerror = function () {
+                const alt = this.src.endsWith('.jpg')
+                    ? this.src.replace(/\.jpg$/, '.JPG')
+                    : this.src.replace(/\.JPG$/, '.jpg');
+                this.onerror = null;
+                this.src = alt;
             };
-        }
-        
-        // Set up automatic scroll after delay
-        setTimeout(() => {
-            // Only autoscroll if we're at the top of the page
-            if (window.scrollY < 50) {
-                smoothScrollToIntro();
+            img.addEventListener('click', () => openLightbox(img.src, p.title));
+            imgWrap.appendChild(img);
+
+            // Text side
+            const desc = document.createElement('div');
+            desc.className = 'painting-description';
+
+            const h3 = document.createElement('h3');
+            h3.textContent = p.title;
+            desc.appendChild(h3);
+
+            if (p.description) {
+                const pEl = document.createElement('p');
+                pEl.innerHTML = p.description;
+                desc.appendChild(pEl);
             }
-        }, 3500); // Allow time to see hero image before scrolling
-        
-        // Add parallax and interactive effects on scroll
-        // Respect user preference for reduced motion
-        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (!prefersReducedMotion) {
-            let latestScrollY = 0;
-            let ticking = false;
 
-            const headerEl = document.querySelector('header');
+            if (p.technic) {
+                const tech = document.createElement('p');
+                tech.className = 'painting-technique';
+                tech.innerHTML = p.technic;
+                desc.appendChild(tech);
+            }
 
-            function onScroll() {
-                latestScrollY = window.scrollY;
-                if (!ticking) {
-                    window.requestAnimationFrame(() => {
-                        const scrollPosition = latestScrollY;
-                        const windowHeight = window.innerHeight;
+            row.appendChild(imgWrap);
+            row.appendChild(desc);
+            gallery.appendChild(row);
+        });
+    }
 
-                        if (scrollPosition < windowHeight * 1.5) {
-                            const parallaxIntensity = Math.min(0.2, (scrollPosition / windowHeight) * 0.2);
-                            if (homeImage) {
-                                // Use transform (composited) instead of top/height changes
-                                homeImage.style.transform = `scale(1) translateY(${scrollPosition * parallaxIntensity}px)`;
-                            }
+    // ── ASCII art portrait ────────────────────────────────────────────
+    let asciiBuilt = false;
 
-                            if (scrollIndicator) {
-                                const scrollFade = Math.max(0, 1 - (scrollPosition / 300));
-                                // Only set opacity, avoid flipping display frequently
-                                scrollIndicator.style.opacity = scrollFade;
-                            }
+    function buildAsciiArt() {
+        if (asciiBuilt) return;
+        asciiBuilt = true;
 
-                            if (headerEl) {
-                                const headerOpacity = Math.min(0.95, Math.max(0.8, 0.8 + (scrollPosition / 500)));
-                                headerEl.style.backgroundColor = `rgba(255, 255, 255, ${headerOpacity})`;
-                            }
-                        }
+        const canvas = document.getElementById('ascii-canvas');
+        const sourceImg = document.getElementById('ascii-source-img');
+        if (!canvas || !sourceImg) return;
 
-                        ticking = false;
-                    });
-                    ticking = true;
+        const chars = ' .,:;i1tfLCG08@#';
+        const cols  = 60;
+
+        function renderAscii(img) {
+            const aspect = img.naturalHeight / img.naturalWidth;
+            const rows   = Math.round(cols * aspect * 0.55); // monospace chars are taller
+
+            // Sample source image
+            const offscreen = document.createElement('canvas');
+            offscreen.width  = cols;
+            offscreen.height = rows;
+            const ctx2 = offscreen.getContext('2d');
+            ctx2.drawImage(img, 0, 0, cols, rows);
+            const data = ctx2.getImageData(0, 0, cols, rows).data;
+
+            // Render to visible canvas
+            const charW = 9;
+            const charH = 16;
+            canvas.width  = cols * charW;
+            canvas.height = rows * charH;
+
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font      = `${charH}px 'Space Mono', monospace`;
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const i = (r * cols + c) * 4;
+                    const brightness = (data[i] * 0.299 + data[i+1] * 0.587 + data[i+2] * 0.114) / 255;
+                    const charIdx = Math.floor(brightness * (chars.length - 1));
+                    const ch = chars[charIdx];
+
+                    // Color: pale greenish-white on dark
+                    const intensity = Math.floor(brightness * 200 + 55);
+                    ctx.fillStyle = `rgb(${Math.floor(intensity * 0.8)}, ${intensity}, ${Math.floor(intensity * 0.9)})`;
+                    ctx.fillText(ch, c * charW, r * charH);
                 }
             }
-
-            window.addEventListener('scroll', onScroll, { passive: true });
         }
-    }
-    
-    // Call the function after the page loads
-    window.addEventListener('load', addPageLoadAnimations);
 
-// Optional: Activate the first tab by default if needed,
-// or ensure the HTML correctly sets the first tab/content as active.
-// Example: If no tab is active initially via HTML, uncomment below:
-// if (tabs.length > 0) {
-//     tabs[0].click(); // Simulate a click on the first tab
-// }
-
-// Fallback: Ensure the home intro text is visible if the animation sequence
-// didn't run (some browsers or cached images can skip the animation handlers).
-window.addEventListener('load', function() {
-    try {
-        const homeIntro = document.querySelector('.home-intro');
-        if (homeIntro && !homeIntro.classList.contains('animate-in')) {
-            // Add classes that CSS and other scripts expect for revealing the intro
-            homeIntro.classList.add('animate-in', 'fully-visible');
-            // Reveal direct intro children
-            homeIntro.querySelectorAll('.intro-content > *').forEach(el => {
-                el.classList.add('animate-in');
+        if (sourceImg.complete && sourceImg.naturalWidth > 0) {
+            renderAscii(sourceImg);
+        } else {
+            sourceImg.addEventListener('load', () => renderAscii(sourceImg));
+            sourceImg.addEventListener('error', () => {
+                // Fallback: show placeholder text
+                canvas.width  = 400;
+                canvas.height = 400;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#111';
+                ctx.fillRect(0, 0, 400, 400);
+                ctx.fillStyle = '#9090c8';
+                ctx.font = '14px Space Mono, monospace';
+                ctx.fillText('[portrait]', 160, 200);
             });
-            // Reveal portfolio intro pieces with the same class so CSS animations run
-            const introMain = homeIntro.querySelector('.portfolio-intro .intro-main');
-            const introPersonal = homeIntro.querySelector('.portfolio-intro .intro-personal');
-            if (introMain) introMain.classList.add('animate-in');
-            if (introPersonal) introPersonal.classList.add('animate-in');
-            // Hide the scroll indicator if present (it may otherwise overlay text)
-            const scrollIndicator = document.querySelector('.scroll-indicator');
-            if (scrollIndicator) {
-                scrollIndicator.classList.add('fade-out');
-                setTimeout(() => { scrollIndicator.style.display = 'none'; }, 600);
-            }
+            // Trigger load
+            sourceImg.src = sourceImg.src;
         }
-    } catch (e) {
-        // keep silent on error
     }
+
+    // ── Scroll-reveal via IntersectionObserver ────────────────────────
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0, rootMargin: '0px 0px -40px 0px' });
+
+    function observeReveals(container) {
+        // Give the browser one frame to paint, then check each element
+        requestAnimationFrame(() => {
+            container.querySelectorAll('.reveal, .reveal-left, .reveal-right').forEach(el => {
+                const rect = el.getBoundingClientRect();
+                if (rect.top < window.innerHeight && rect.bottom > 0) {
+                    // Already visible in viewport — animate in immediately
+                    el.classList.add('is-visible');
+                } else {
+                    // Below the fold — use scroll observer
+                    revealObserver.observe(el);
+                }
+            });
+        });
+    }
+
+    // Add reveal classes to static elements
+    document.querySelectorAll('.music-spotify-wrap, .music-bio, .streaming-logos-large').forEach((el, i) => {
+        el.classList.add('reveal');
+        el.style.transitionDelay = `${i * 0.12}s`;
+    });
+    document.querySelectorAll('.about-portrait-col, .about-text-col').forEach((el, i) => {
+        el.classList.add('reveal');
+        el.style.transitionDelay = `${i * 0.1}s`;
+    });
+    document.querySelectorAll('.ai-project-item').forEach((el, i) => {
+        el.classList.add('reveal');
+        el.style.transitionDelay = `${i * 0.1}s`;
+    });
+    document.querySelectorAll('.ai-profile-links').forEach(el => el.classList.add('reveal'));
+    document.querySelectorAll('.article-featured').forEach(el => el.classList.add('reveal'));
+    document.querySelectorAll('.scroll-invite').forEach(el => el.classList.add('reveal'));
+
+    // ── Painting carousel ─────────────────────────────────────────────
+    const TOTAL = 3;
+    let currentSlide = 0;
+
+    function goToSlide(idx) {
+        const slides = document.querySelectorAll('.carousel-slide');
+
+        slides.forEach(slide => {
+            const si = Number(slide.dataset.index);
+            const diff = ((si - idx) % TOTAL + TOTAL) % TOTAL; // 0=current,1=next,2=prev
+            slide.classList.remove('is-current', 'is-next', 'is-prev', 'is-hidden');
+            if      (diff === 0) slide.classList.add('is-current');
+            else if (diff === 1) slide.classList.add('is-next');
+            else if (diff === 2) slide.classList.add('is-prev');
+            else                 slide.classList.add('is-hidden');
+        });
+
+        // Descriptions
+        document.querySelectorAll('.carousel-slide-desc').forEach(d => d.classList.remove('visible'));
+        const desc = document.querySelector(`.carousel-slide-desc[data-index="${idx}"]`);
+        if (desc) desc.classList.add('visible');
+
+        // Dots
+        document.querySelectorAll('.carousel-dot').forEach(d => d.classList.remove('active'));
+        const dot = document.querySelector(`.carousel-dot[data-index="${idx}"]`);
+        if (dot) dot.classList.add('active');
+    }
+
+    // Init
+    goToSlide(0);
+
+    // Dot clicks
+    document.querySelectorAll('.carousel-dot').forEach(dot => {
+        dot.addEventListener('click', () => {
+            currentSlide = Number(dot.dataset.index);
+            goToSlide(currentSlide);
+        });
+    });
+
+    // Arrow clicks
+    const prevBtn = document.getElementById('carousel-prev');
+    const nextBtn = document.getElementById('carousel-next');
+    if (prevBtn) prevBtn.addEventListener('click', () => {
+        currentSlide = (currentSlide - 1 + TOTAL) % TOTAL;
+        goToSlide(currentSlide);
+    });
+    if (nextBtn) nextBtn.addEventListener('click', () => {
+        currentSlide = (currentSlide + 1) % TOTAL;
+        goToSlide(currentSlide);
+    });
+
+    // ── Lightbox ──────────────────────────────────────────────────────
+    const lightbox   = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxTitle = document.getElementById('lightbox-title');
+    const lightboxClose = document.getElementById('lightbox-close');
+
+    window.openLightbox = function(src, title) {
+        lightboxImg.src = src;
+        lightboxTitle.textContent = title || '';
+        lightbox.classList.add('active');
+    };
+
+    window.openAiLightbox = function(src, title) {
+        openLightbox(src, title);
+    };
+
+    if (lightboxClose) {
+        lightboxClose.addEventListener('click', () => lightbox.classList.remove('active'));
+    }
+    if (lightbox) {
+        lightbox.addEventListener('click', e => {
+            if (e.target === lightbox) lightbox.classList.remove('active');
+        });
+    }
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') lightbox.classList.remove('active');
+    });
 });
-
-
-

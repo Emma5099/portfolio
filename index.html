@@ -4,202 +4,320 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Portfolio of Emma Genthon (M-A), AI Engineer specializing in LLMs, RAG and AI deployment on Azure. Research at CNRS on LLMs (quantization, PEFT) and artistic projects mixing AI, music and painting.">
-    <meta name="keywords" content="M-A, Emma Genthon, artist, M-A, music, painting, AI Engineer, LLMs, RAG, Azure, CNRS, quantization, PEFT">
+    <meta name="description" content="Portfolio of Emma Genthon (M-A), AI Engineer and Artist.">
     <meta name="author" content="Emma Genthon">
-    <meta property="og:title" content="Emma Genthon - AI Engineer & Artist">
-    <meta property="og:description" content="Portfolio of Emma Genthon (M-A), an Artist and AI Engineer specializing in LLMs, RAG and AI deployment on Azure. Research at CNRS on LLMs (quantization, PEFT) and artistic projects mixing AI, music and painting.">
+    <meta property="og:title" content="M-A — Emma Genthon">
     <meta property="og:type" content="website">
     <meta property="og:image" content="images/general_banger.png">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Emma Genthon - AI Engineer & Artist">
-    <meta name="twitter:description" content="Artist and AI Engineer specializing in LLMs, RAG and Azure deployment.">
-    <title>Emma Genthon - AI Engineer & Artist | M-A Official</title>
-    <link rel="stylesheet" href="style.css">    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <title>M-A — Emma Genthon</title>
+    <link rel="icon" type="image/png" href="images/profile-picture.png">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Montserrat:wght@300;400;500&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
-    </head>
-<body>
-    <div class="lateral-bar">
-        <span class="lateral-text">M-A</span>
-    </div>
-    <header>
-        <!-- Mobile menu toggle added for small screens -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme" id="body">
+
+    <!-- ── Navigation ── -->
+    <header id="site-header">
         <button id="menu-toggle" class="menu-toggle" aria-label="Open menu" aria-expanded="false">
             <span class="bar"></span>
             <span class="bar"></span>
             <span class="bar"></span>
         </button>
-        <nav>
+        <nav id="main-nav">
             <ul>
-                <li><a href="index.html" class="active">Home</a></li>
-                <li><a href="music.html">Music</a></li>
-                <li><a href="painting.html">Painting</a></li>
-                <li><a href="ai.html">AI</a></li>
-                <li><a href="about.html">About Me</a></li>
+                <li><a href="#" data-tab="paint">Paintings</a></li>
+                <li><a href="#" data-tab="music">Music</a></li>
+                <li><a href="#" data-tab="ai-art">AI</a></li>
+                <li><a href="#" data-tab="articles">Articles</a></li>
+                <li><a href="#" data-tab="about">About Me</a></li>
             </ul>
         </nav>
     </header>
+
     <main>
-        <section id="home" class="tab-content active">
-            <div class="hero-container">
-                <div class="hero-image-wrapper">
-                    <img src="images/general_banger.png" alt="General Website Visual" class="home-image">
-                    <div class="scroll-indicator">
-                        <span>Discover More</span>
-                        <div class="scroll-arrow"></div>
-                    </div>
-                    <!-- Adding a subtle overlay for visual depth -->
-                    <div class="hero-overlay"></div>
-                </div>
-                <div class="home-intro">
-                    <div class="intro-content">
-                        <h1>Hi, I'm M - A </h1>
-                        <div class="divider"></div>
-                       <div class="portfolio-intro">
-    <p class="intro-main">I'm an Applied AI Engineer and an Artist.</p>
-    <p class="intro-personal">
-        I'm designing and developing AI solutions for all different types of uses cases (you can find more about my work in the AI section).
 
-        I'm also an artist, song-writer, musician and painter. <br><br>
-        Feel free to explore my creative chaos 🤍
-</p>
-         <br><br><a href="#me-about" class="connect-link" data-tab="me-about">connect with me</a>
-    </p>
-</div>
-                    </div>
+        <!-- ══════════════════ HOME ══════════════════ -->
+        <section id="home" class="tab-content active dark-section">
+            <div class="home-grid">
+                <div class="home-title-col">
+                    <h1 class="home-heading">Hi, I'm<br>M&#8209;A</h1>
                 </div>
-            </div>
-        </section>
-             <section id="ai" class="tab-content">
-            <div class="ai-links-container">
-                <h2>Applied AI</h2>
-                <p class="ai-intro"> Feel free to connect on LinkedIn and explore my professional and personal projects.
-                    <br><br>
-                
-                <div class="ai-links">
-                    <a href="https://www.linkedin.com/in/emmagenthon/" target="_blank" class="ai-link">
-                        <img src="images/linkedinlogo.png" alt="LinkedIn" class="ai-logo">
-                        <span>LinkedIn</span>
-                    </a>
-                    <a href="https://github.com/Emma5099" target="_blank" class="ai-link">
-                        <img src="images/gitlogo.png" alt="GitHub" class="ai-logo">
-                        <span>GitHub</span>
-                    </a>
-                    <a href="https://huggingface.co/Emma5099/models" target="_blank" class="ai-link">
-                        <img src="images/hflogo.svg" alt="Hugging Face" class="ai-logo">
-                        <span>Hugging Face</span> 
-                    </a>
-                </div>
-            </div>
-        </section>
-        <section id="music" class="tab-content">
-            <div class="music-links-container">
-                <div class="music-players">
-                    <div class="player-container">
-                        <iframe style="border-radius:12px" src="https://open.spotify.com/embed/artist/5v8fSIV6a2nJwHNHWHHHa5?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-                    </div>
-                </div>
-                <div class="streaming-links">
-                    <a href="https://www.deezer.com/fr/artist/224674025" target="_blank" class="streaming-link">
-                        <img src="images/deezer-logo.png" alt="Deezer" class="streaming-logo">
-                        <span>Open in Deezer</span>
-                    </a>
-                    <a href="https://open.spotify.com/intl-fr/artist/5v8fSIV6a2nJwHNHWHHHa5" target="_blank" class="streaming-link">
-                        <img src="images/spotify-logo.png" alt="Spotify" class="streaming-logo">
-                        <span>Open in Spotify</span> 
-                    </a>
-                    <a href="https://www.youtube.com/channel/UCFuuOTOczyOkD5aUUBfKy0A" target="_blank" class="streaming-link">
-                        <img src="images/youtube-logo.png" alt="YouTube" class="streaming-logo">
-                        <span>Open in YouTube</span>
-                    </a>
-                </div>
-            </div>
-        </section>
-        
-        <section id="painting" class="tab-content">
-            <h2>Artistic Work</h2>
-            <div class="gallery-container">
-                <div class="alternating-gallery" id="paintings-gallery">
-                    <!-- Paintings with descriptions will be loaded here via JavaScript -->
-                </div>
-            </div>
-        </section>
-        
-        <section id="me-about" class="tab-content">
-            <h2>About Me & Contact</h2> 
-            <div class="about-content">
-                <div class="contact-info">
-                    My name is Emma Genthon <br><br>
-
-                    After engineering studies, I now work as an Applied AI Engineer. <br><br>
-
-                    I did 12 years of classical piano, I ditched Chopin for rap and pop.<br><br>
-                    Along the way I taught myself guitar, bass and musical softwares.<br><br>
-
-                    I write, compose, record, mix and master by myself in my room so be prepared to hear DIY music.
-
-                    <div class="contact-section">
-                        <p class="about-contact-prompt">Want to chat, collab, or send fanmail with perfume?</p>
-                        <div class="contact-links">
-                            <a href="https://www.instagram.com/maofficialmusique?igsh=enl1ODl0aHc3ZnVr&utm_source=qr" target="_blank" class="connect-link" onclick="window.open('https://www.instagram.com/maofficialmusique?igsh=enl1ODl0aHc3ZnVr&utm_source=qr', '_blank'); return false;"><img src="images/instalogo.jpg" alt="Instagram" class="contact-logo"> @maofficialmusique</a>
-
-                            <a href="mailto:maofficialmusique@gmail.com" class="connect-link" onclick="window.location.href='mailto:maofficialmusique@gmail.com'; return false;"><img src="images/maillogo.jpg" alt="Email" class="contact-logo"> maofficialmusique@gmail.com</a>
+                <div class="home-video-col">
+                    <div class="home-video-wrapper">
+                        <video autoplay muted loop playsinline class="home-video">
+                            <source src="videos/home-video.mov" type="video/mp4">
+                            <source src="images/Screen Recording 2026-06-07 at 22.35.43.mov" type="video/mp4">
+                        </video>
+                        <div class="play-icon-overlay">
+                            <div class="play-circle">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="about-image">
-                    <img src="images/pdp.jpg" alt="Profile Picture" class="profile-image">
+                <div class="home-bio-col">
+                    <p class="home-bio-text">
+                        I'm an AI Engineer and also an Artist.<br>
+                        My art and research are about<br>
+                        biases, ethic, ecology and society<br>
+                        around AI.<br>
+                        Welcome to my portfolio<br>
+                        <strong>and feel free to connect</strong>
+                    </p>
                 </div>
             </div>
         </section>
-        
-    </main>
-    
-    <!-- Lightbox for image gallery -->
-    <div class="lightbox" id="lightbox">
-        <div class="lightbox-close" id="lightbox-close">&times;</div>
-        <div class="lightbox-nav">
-            <button id="prev-btn">&lt;</button>
-            <button id="next-btn">&gt;</button>
-        </div>
-        <div class="lightbox-content">
-            <img src="" alt="" class="lightbox-img" id="lightbox-img">
-            <div class="lightbox-caption" id="lightbox-caption">
-                <h3 id="lightbox-title"></h3>
-                <p id="lightbox-description"></p>
+
+        <!-- ══════════════════ ABOUT ME ══════════════════ -->
+        <section id="about" class="tab-content dark-section">
+            <div class="about-grid">
+                <div class="about-text-col">
+                    <h2 class="about-heading">Hello! I'm M&#8209;A!</h2>
+                    <p>I'm a french AI Engineer. I have worked in medical imagery, extreme compression of transformers, ethics among large language models trainings and now working mostly for clients implementing AI.</p>
+                    <p>Apart from the work, I read, teach and give speech about the potential of use of AI, help people understand AI. As I'm also an artist, I expressed those problematics through my art.</p>
+                    <p>I compose all my songs in my room, do all the paintings with basic supplies and work in the combination of art and technology on subjects that interests me.</p>
+                    <p>If you feel that my subjects interest you, you can contact me though:</p>
+                    <div class="about-contact-links">
+                        <a href="https://www.linkedin.com/in/emmagenthon/" target="_blank" rel="noopener">Linkedin</a>
+                        <a href="mailto:maofficialmusique@gmail.com">Email</a>
+                        <a href="https://www.instagram.com/maofficialmusique" target="_blank" rel="noopener">Instagram</a>
+                        <a href="https://www.youtube.com/channel/UCFuuOTOczyOkD5aUUBfKy0A" target="_blank" rel="noopener">YouTube</a>
+                    </div>
+                </div>
+                <div class="about-portrait-col">
+                    <img src="images/profile-picture.png" alt="M-A portrait" class="about-profile-img">
+                    <p class="about-portrait-caption">Emma Genthon was born on the 11th of June 1999. She is an AI Engineer who has worked for many different companies, and also a researcher and artist. She combines tech and art to express topics around AI such as ethics, biases, ecology and society.</p>
+                    <canvas id="ascii-canvas" aria-label="ASCII art portrait" style="display:none;"></canvas>
+                    <img id="ascii-source-img" src="images/pdpwhite.jpg" alt="Portrait" style="display:none;">
+                </div>
             </div>
+        </section>
+
+        <!-- ══════════════════ PAINT ══════════════════ -->
+        <section id="paint" class="tab-content light-section">
+            <div class="light-section-inner">
+<div class="alternating-gallery" id="paintings-gallery">
+                    <!-- JS populated -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ══════════════════ MUSIC ══════════════════ -->
+        <section id="music" class="tab-content dark-section">
+            <div class="music-content">
+                <!-- Spotify compact embed -->
+                <div class="music-spotify-wrap">
+                    <iframe style="border-radius:6px"
+                        src="https://open.spotify.com/embed/artist/5v8fSIV6a2nJwHNHWHHHa5?utm_source=generator&theme=0"
+                        width="100%" height="152" frameBorder="0" allowfullscreen=""
+                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+                </div>
+                <!-- Bio text -->
+                <div class="music-bio">
+                    <p>I did 12 years of classical piano but I ditched Chopin for rap and pop like any teenager would do.</p>
+                    <p>I compose, improvise, create, write, adjust, record, mix and masterize all by myself in my room, so it's pretty DYI.</p>
+                    <p>I started creating melodies and beats, writing texts, then put everything into songs. I never defined myself as a singer but ended up singing.</p>
+                    <p>I'm really proud of my music, feel free to listen:</p>
+                </div>
+                <!-- Large streaming platform logos -->
+                <div class="streaming-logos-large">
+                    <a href="https://open.spotify.com/intl-fr/artist/5v8fSIV6a2nJwHNHWHHHa5" target="_blank" rel="noopener" class="stream-logo-large" aria-label="Spotify">
+                        <img src="images/spotify.png" alt="Spotify">
+                    </a>
+                    <a href="https://www.deezer.com/fr/artist/224674025" target="_blank" rel="noopener" class="stream-logo-large" aria-label="Deezer">
+                        <img src="images/deezer.png" alt="Deezer">
+                    </a>
+                    <a href="https://music.apple.com/us/artist/m-a/1717963851" target="_blank" rel="noopener" class="stream-logo-large" aria-label="Apple Music">
+                        <img src="images/applemusic.png" alt="Apple Music">
+                    </a>
+                    <a href="https://www.youtube.com/channel/UCFuuOTOczyOkD5aUUBfKy0A" target="_blank" rel="noopener" class="stream-logo-large" aria-label="YouTube">
+                        <img src="images/youtube.png" alt="YouTube">
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ══════════════════ ARTICLES ══════════════════ -->
+        <section id="articles" class="tab-content light-section">
+            <div class="light-section-inner">
+                    <h2 class="article-featured-title">
+                        Weights in LLMs are <strong>not equally important</strong><br>
+                        and nobody talks about it
+                    </h2>
+                    <div class="article-featured-body article-featured-body--reverse">
+                        <div class="article-featured-image">
+                            <img src="images/weights.PNG" alt="Weights in LLMs">
+                        </div>
+                        <div class="article-featured-text">
+                            <p>AI Model are actually a big excel sheet full of numbers.</p>
+                            <p>In order to make 'AI' pretends to be smart, we additionnate and multiple those numbers in order to provide a percentage at the end.</p>
+                            <p>During my year of research at the CNRS, I wondered if all the numbers had the same importance. I found out something crazy: <strong>outliers were the most important ones.</strong></p>
+                            <p class="article-code-block">bin 0 (near-zero bulk) → accuracy drop: ~0.01%<br>bin 14 (outliers) → accuracy drop: ~0.8%</p>
+                            <p>Well after realizing that, I started to realize the famous compression fine-tuning technique <strong>QLoRA was actually not optimal</strong> because it was focusing on the near-zero values instead of the outliers.</p>
+                            <p>I suggested the whole method and process here:</p>
+                            <a href="https://medium.com/@genthonemma/weights-in-llms-are-not-equally-important-and-nobody-talks-about-it-e447290b10b2" target="_blank" rel="noopener" class="article-link-pill">Read the full article →</a>
+                        </div>
+                    </div>
+
+                <!-- Scroll indicator -->
+                <div class="scroll-invite">
+                    <span class="scroll-invite-label">next article</span>
+                    <div class="scroll-arrow">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 5v14M5 12l7 7 7-7"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Article 2 -->
+                <article class="article-featured">
+                    <h2 class="article-featured-title">
+                        I Fine-Tuned a model on the <strong>Worst Part of Internet</strong><br>
+                    </h2>
+                    <div class="article-featured-body">
+                        <div class="article-featured-image">
+                            <img src="ai/Adversarial.png" alt="The Worst Part of Internet" class="article-img--small">
+                        </div>
+                        <div class="article-featured-text">
+                            <p>On one hand, <strong>I fine-tuned a model on sexist and racist texts</strong> (mostly found on Reddit and Twitter incel forums). </p>
+                            <p>On the other hand, <strong>I painted a black woman</strong>.</p>
+                            <p class="article-emphasis"><strong>I then asked my model his thoughts about this woman.</strong></p>
+                            <p>You can read the answers in the background and can be shocking. </p>
+
+                            <p>We tends to always put AI as the bad guy from a James Bond movie, but actually it is just our devoted parrot repeating <strong>data we consume online everyday.</strong></p>
+                            <p>That is not I do not consider 'AI' as 'AI' because few hours of fine-tuning makes the 'AI' just the <strong>dumbest-sexiest-most-racist-creature</strong>, and for me this is not what I call intelligence of any kind.</p>
+
+                            <a href="https://medium.com/@genthonemma/i-fine-tuned-a-lora-on-the-worst-part-of-internet-and-painted-the-results-d78fab4b4188" target="_blank" rel="noopener" class="article-link-pill">Read the full article →</a>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- Scroll indicator -->
+                <div class="scroll-invite">
+                    <span class="scroll-invite-label">more articles</span>
+                    <div class="scroll-arrow">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 5v14M5 12l7 7 7-7"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Article 3: Instagram Captions -->
+                <article class="article-featured article-featured--centered">
+                    <h2 class="article-featured-title">
+                        I Fine-Tuned a LoRA on <strong>Instagram Captions</strong><br>
+                        and I painted the results
+                    </h2>
+                    <div class="article-insta-body">
+                        <p class="article-insta-intro">I fine-tuned a LoRA on Instagram captions then used it to generate captions. I found out that the model generates 3 types of captions in average. I then painted the persons I imagine would have posted them for each type of caption.</p>
+
+                        <!-- Painting carousel -->
+                        <div class="painting-carousel" id="insta-carousel">
+                            <!-- Left: painting track + arrows -->
+                            <div class="carousel-left">
+                                <div class="carousel-track">
+                                    <div class="carousel-slide is-current" data-index="0"><img src="ai/Lookatme.png" alt="Look at Me"></div>
+                                    <div class="carousel-slide is-next"    data-index="1"><img src="ai/Kids.png"     alt="Kids"></div>
+                                    <div class="carousel-slide is-hidden"  data-index="2"><img src="ai/Bland.png"    alt="Bland"></div>
+                                </div>
+                                <div class="carousel-nav">
+                                    <button class="carousel-arrow" id="carousel-prev" aria-label="Previous">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+                                    </button>
+                                    <div class="carousel-dots">
+                                        <button class="carousel-dot active" data-index="0"></button>
+                                        <button class="carousel-dot" data-index="1"></button>
+                                        <button class="carousel-dot" data-index="2"></button>
+                                    </div>
+                                    <button class="carousel-arrow" id="carousel-next" aria-label="Next">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Right: description -->
+                            <div class="carousel-right">
+                                <div class="carousel-slide-desc visible" data-index="0">
+                                    <span class="carousel-num">01 / 03</span>
+                                    <p>Roughly 3/10 captions were about beauty, makeup, and outfits etc.. and 1/10 mentioned the Kardashians ! I reunited both in one painting: I imagined a woman (ok it might be a bit cliché) in a swimsuit posting this caption.</p>
+                                </div>
+                                <div class="carousel-slide-desc" data-index="1">
+                                    <span class="carousel-num">02 / 03</span>
+                                    <p>Roughly 3/10 captions were about kids. I found that striking — so many children are exposed online — and (even if we know now the consequences) so I wanted to make that visible.</p>
+                                </div>
+                                <div class="carousel-slide-desc" data-index="2">
+                                    <span class="carousel-num">03 / 03</span>
+                                    <p>Roughly 3/10 captions were bland, neutral, and barely personal — lines like "made me smile…", "2017…", "Wednesday night": so yeah, we are bland.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <a href="https://medium.com/@genthonemma/i-fine-tuned-a-lora-on-instagram-captions-and-i-painted-the-results-49dabb8715de" target="_blank" rel="noopener" class="article-link-pill">Read the full article →</a>
+                    </div>
+                </article>
+
+            </div>
+        </section>
+
+        <!-- ══════════════════ AI AND ART ══════════════════ -->
+        <section id="ai-art" class="tab-content dark-section">
+
+            <!-- Projects -->
+            <div class="ai-projects" id="ai-projects">
+
+                <!-- Project 1: Music Generator -->
+                <div class="ai-project-item">
+                    <div class="ai-project-video-wrap">
+                        <video controls playsinline>
+                            <source src="videos/music-generator.mov" type="video/mp4">
+                            <source src="videos/music-generator.mov" type="video/quicktime">
+                        </video>
+                    </div>
+                    <div class="ai-project-desc-col">
+                        <p>I fine-tuned an <strong>music generator model</strong> based on keywords in order to <strong></strong>generate a sample</strong>. <br> <br>
+                           Samples are the key to modern music and the selection of them can be one of the most important part of the creating process.
+                            I wondered if creating a sample from AI could be as good as a human one. <br> <br>
+                            I though it was interesting to start with an AI Sample and put as much human brain and creativity after that and see what happens. <br> <br>
+                            You can check the full song on my instagram <a href="https://www.instagram.com/maofficialmusique" target="_blank" rel="noopener" class="ai-inline-link">here</a></p>
+                    </div>
+                </div>
+
+
+                <!-- Profile links — bottom -->
+                <div class="ai-profile-links">
+                    <a href="https://github.com/Emma5099" target="_blank" rel="noopener" class="ai-profile-link" aria-label="GitHub">
+                        <img src="images/gitlogo.png" alt="GitHub">
+                        <span>GitHub</span>
+                    </a>
+                    <a href="https://huggingface.co/Emma5099" target="_blank" rel="noopener" class="ai-profile-link" aria-label="Hugging Face">
+                        <img src="images/hflogo.svg" alt="Hugging Face">
+                        <span>Hugging Face</span>
+                    </a>
+                    <a href="https://www.linkedin.com/in/emmagenthon/" target="_blank" rel="noopener" class="ai-profile-link" aria-label="LinkedIn">
+                        <img src="images/linkedinlogo.png" alt="LinkedIn">
+                        <span>LinkedIn</span>
+                    </a>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Lightbox -->
+    <div id="lightbox" class="lightbox">
+        <div class="lightbox-close" id="lightbox-close">&times;</div>
+        <div class="lightbox-content">
+            <img src="" alt="" id="lightbox-img" class="lightbox-img">
+            <p id="lightbox-title" class="lightbox-caption"></p>
         </div>
     </div>
 
     <script src="script-multipage.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Smooth tab switch for 'connect with me' link
-            document.querySelectorAll('.connect-link[data-tab]').forEach(function(link) {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    // Ensure we are at the top before switching tabs
-                    window.scrollTo({ top: 0, behavior: 'auto' });
-                    const tab = link.getAttribute('data-tab');
-                    if (tab) {
-                        document.querySelectorAll('.tab-content').forEach(function(section) {
-                            section.classList.remove('active');
-                        });
-                        document.querySelector(`#${tab}`).classList.add('active');
-                        // Update nav active state
-                        document.querySelectorAll('nav a').forEach(function(a) {
-                            a.classList.remove('active');
-                            if (a.getAttribute('data-tab') === tab) {
-                                a.classList.add('active');
-                            }
-                        });
-                        // Update URL hash
-                        window.location.hash = `#${tab}`;
-                    }
-                });
-            });
-        });
-    </script>
 </body>
 </html>
