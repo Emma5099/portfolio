@@ -1,0 +1,7 @@
+[build]
+  publish = "."
+
+[dev]
+  command = "npx --yes serve . --listen 8080"
+  targetPort = 8080
+  publish = "."

@@ -95,6 +95,14 @@ document.addEventListener('DOMContentLoaded', () => {
     function showSection(targetId) {
         const next = document.getElementById(targetId);
         if (!next) return;
+
+        sections.forEach(section => {
+            if (section !== next) {
+                section.classList.remove('active', 'tab-visible');
+                section.style.display = 'none';
+            }
+        });
+
         next.classList.add('active');
         next.style.display = 'block';
         if (targetId === 'paint') buildPaintingsGrid();
@@ -167,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── Hash routing on load ──────────────────────────────────────────
     const hash = window.location.hash.replace('#', '');
     const validTabs = ['home', 'music', 'paint', 'ai-art', 'articles', 'about'];
-    const initial = validTabs.includes(hash) ? hash : 'paint';
+    const initial = validTabs.includes(hash) ? hash : 'home';
     activateTab(initial, false);
 
     // ── Build alternating paintings gallery ───────────────────────────
