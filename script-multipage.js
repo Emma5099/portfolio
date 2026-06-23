@@ -92,6 +92,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // ── Tab activation ────────────────────────────────────────────────
     let isTransitioning = false;
 
+    function restartMusic2DanceGif() {
+        const gif = document.getElementById('music2dance-gif');
+        if (!gif) return;
+        const baseSrc = gif.getAttribute('src').split('?')[0];
+        gif.src = `${baseSrc}?t=${Date.now()}`;
+    }
+
     function showSection(targetId) {
         const next = document.getElementById(targetId);
         if (!next) return;
@@ -107,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         next.style.display = 'block';
         if (targetId === 'paint') buildPaintingsGrid();
         if (targetId === 'about') buildAsciiArt();
+        if (targetId === 'ai-art') restartMusic2DanceGif();
         // One rAF to paint display:block, then fade in + reveal
         requestAnimationFrame(() => {
             next.classList.add('tab-visible');
