@@ -9,40 +9,10 @@ const paintingsData = [
         small: true 
     },
     {
-        filename: 'ai/Lookatme.png',
-        title: 'Look at Me',
-        description: "I fine-tuned a model only on instagram captions and asked to generate a lot of samples to understand the general topics people were posting about. <br> <br> Roughly 3/10 Instagram captions were about beauty, makeup, and outfits — 1/10 mentioned the Kardashians. I imagined the person who would post them.",
-        technic: "Acrylic on canvas. Fine-tuning of a Mistral model with a LoRA.",
-        noPrefix: true,
-        small: true
-    },
-    {
-        filename: 'ai/Kids.png',
-        title: 'Kids',
-        description: "I fine-tuned a model only on instagram captions and asked to generate a lot of samples to understand the general topics people were posting about. <br> <br> Roughly 3/10 captions were about children. So many kids are exposed online — I wanted to make that visible.",
-        technic: "Acrylic on canvas. Fine-tuning of a Mistral model with a LoRA.",
-        noPrefix: true,
-        small: true
-    },
-    {
-        filename: 'ai/Bland.png',
-        title: 'Bland',
-        description: "I fine-tuned a model only on instagram captions and asked to generate a lot of samples to understand the general topics people were posting about. <br> <br> Roughly 3/10 captions were neutral and barely personal — 'made me smile…', '2017…', 'Wednesday night': so yeah, we are bland.",
-        technic: "Acrylic on canvas. Fine-tuning of a Mistral model with a LoRA.",
-        noPrefix: true,
-        small: true
-    },
-    {
         filename: 'image3.jpg',
         title: 'Chromatic Journey',
         description: "Two canvases built around vermilion — my favourite colour from my very first painting kit in primary school.",
         technic: "Marker on photo paper, Collage and Acrylic on canvas."
-    },
-    {
-        filename: 'image4.jpg',
-        title: 'Stuck',
-        description: "Painted in the same period as my EP. A depiction of feeling trapped or immobilized — like in a bad relationship.",
-        technic: "Acrylic & Markers on canvas."
     },
     {
         filename: 'image1.jpg',
@@ -61,12 +31,18 @@ const paintingsData = [
         title: 'Media Women',
         description: "I painted the way women are portrayed in media in general.",
         technic: "Acrylic on canvas."
+    },
+    {
+        filename: 'image4.jpg',
+        title: 'Stuck',
+        description: "Painted in the same period as my EP. A depiction of feeling trapped or immobilized — like in a bad relationship.",
+        technic: "Acrylic & Markers on canvas."
     }
 ];
 
 // ── Dark / light sections ─────────────────────────────────────────────
 const darkTabs  = new Set(['home', 'about', 'ai-art', 'music']);
-const lightTabs = new Set(['paint', 'articles']);
+const lightTabs = new Set(['home', 'paint', 'music', 'ai-art', 'articles', 'about']);
 
 // ── DOM ready ─────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
@@ -113,7 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
         next.classList.add('active');
         next.style.display = 'block';
         if (targetId === 'paint') buildPaintingsGrid();
-        if (targetId === 'about') buildAsciiArt();
+        if (targetId === 'about') { try { buildAsciiArt(); } catch (e) { console.warn(e); } }
         if (targetId === 'ai-art') restartMusic2DanceGif();
         // One rAF to paint display:block, then fade in + reveal
         requestAnimationFrame(() => {

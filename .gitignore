@@ -1,5 +1,36 @@
-# Environment variables (contains sensitive data)
+# Environment / secrets
 .env
-
-# Deploy script (may contain sensitive configuration)
+.env.*
+!.env.example
 deploy_local.ps1
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Editor / IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Scratch / download dumps in repo root
+inline_image_preview.jpg
+maxresdefault.jpg
+depositphotos_*.jpg
+360_F_*.jpg
+9.webp
+AI.mp4
+AI (1).mp4
+Untitled.mov
+loop bad quality video.mov
+copy_*.mov
+
+# Duplicate / scratch assets
+images/cover copy.png
+videos/cover.png
+videos/cover copy.png
+images/icons/Screenshot *.png
+images/copy_*.mov
+images/Screen Recording*
