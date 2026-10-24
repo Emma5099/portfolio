@@ -1,0 +1,143 @@
+/* ═══════════════════════════════════════════════════
+   INSTAGRAM CAPTIONS — a quiet carousel: one painting at a time,
+   thin progress segments, a mono counter, two arrows.
+═══════════════════════════════════════════════════ */
+.ig-project { --ig-ink: #111; --ig-soft: #77736c; --ig-faint: rgba(17,17,17,.14); border-bottom-color: var(--ig-faint); }
+.ig-carousel { min-width: 0; outline: none; }
+.ig-carousel:focus-visible { outline: 2px solid var(--ig-ink); outline-offset: 8px; }
+
+.ig-stage {
+    position: relative; width: 100%;
+    aspect-ratio: 1 / 1; max-height: 62vh;
+    cursor: pointer; touch-action: pan-y; user-select: none;
+}
+.ig-slide {
+    position: absolute; inset: 0; margin: 0;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; transform: translateX(16px);
+    transition: opacity .5s ease, transform .5s ease;
+    pointer-events: none;
+}
+.ig-slide.is-prev { transform: translateX(-16px); }
+.ig-slide.is-active { opacity: 1; transform: none; pointer-events: auto; }
+.ig-slide img { display: block; max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
+
+.ig-bar { display: flex; align-items: center; gap: 16px; margin-top: 20px; }
+.ig-count { font-family: 'Space Mono', ui-monospace, Menlo, monospace; font-size: .78rem; color: var(--ig-soft); white-space: nowrap; }
+.ig-count b { color: var(--ig-ink); font-weight: 700; }
+.ig-steps { flex: 1 1 auto; display: flex; gap: 6px; }
+.ig-steps button {
+    flex: 1 1 0; height: 14px; padding: 0; border: 0; background: none; cursor: pointer; position: relative;
+}
+.ig-steps button::before {
+    content: ""; position: absolute; left: 0; right: 0; top: 6px; height: 2px;
+    background: var(--ig-faint); transition: background .3s;
+}
+.ig-steps button.is-on::before { background: var(--ig-ink); }
+.ig-steps button:focus-visible { outline: 2px solid var(--ig-ink); outline-offset: 2px; }
+.ig-arrow {
+    width: 40px; height: 40px; flex: none; border-radius: 50%;
+    border: 1px solid var(--ig-faint); background: none; color: var(--ig-ink);
+    font-size: 1rem; line-height: 1; cursor: pointer;
+    transition: border-color .2s, background .2s, color .2s;
+}
+.ig-arrow:hover { border-color: var(--ig-ink); }
+.ig-arrow:focus-visible { outline: 2px solid var(--ig-ink); outline-offset: 2px; }
+
+/* text side */
+.ig-project .ai-project-title { color: var(--ig-ink); }
+.ig-intro { margin: 0; color: #2b2b2b; }
+.ig-info {
+    margin-top: 24px; padding-top: 18px; border-top: 1px solid var(--ig-faint);
+    transition: opacity .3s;
+}
+.ig-info.is-fading { opacity: 0; }
+.ig-name { margin: 0; font-family: 'Space Mono', ui-monospace, Menlo, monospace; font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; color: var(--ig-ink); }
+.ig-text { margin: 6px 0 0; font-size: 1rem; line-height: 1.65; color: #2b2b2b; }
+.ig-project .article-link-pill { margin-top: 22px; }
+
+@media (max-width: 900px) {
+    .ig-project { grid-template-columns: 1fr; gap: 28px; }
+    .ig-stage { max-height: 70vh; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .ig-slide, .ig-info { transition: none; }
+}
+
+/* CENTRED — the project closes the Paintings tab */
+.ig-centered {
+    max-width: 760px; margin: clamp(48px, 10vh, 120px) auto 0;
+    padding: clamp(48px, 8vh, 88px) 0 clamp(48px, 8vh, 96px);
+    border-top: 1px solid var(--ig-faint);
+    text-align: center; color: var(--ig-ink);
+    font-family: 'Inter Tight', 'Helvetica Neue', Arial, sans-serif;
+}
+.ig-tag {
+    display: block; margin-bottom: 14px;
+    font-family: 'Space Mono', ui-monospace, Menlo, monospace;
+    font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ig-soft);
+}
+.ig-title { margin: 0; font-weight: 300; letter-spacing: -.03em; line-height: 1.05; font-size: clamp(2rem, 4vw, 3.2rem); }
+.ig-centered .ig-intro { max-width: 36em; margin: 18px auto 0; font-size: 1.02rem; line-height: 1.65; }
+.ig-centered .ig-carousel { max-width: 560px; margin: clamp(32px, 6vh, 56px) auto 0; }
+.ig-centered .ig-stage { max-height: 60vh; }
+.ig-centered .ig-bar { justify-content: center; }
+.ig-centered .ig-steps { flex: 0 1 180px; }
+.ig-centered .ig-info { max-width: 32em; margin: 28px auto 0; border-top: 0; padding-top: 0; }
+.ig-more {
+    display: inline-block; margin-top: 22px; color: var(--ig-ink); font-size: .95rem;
+    text-decoration: underline; text-decoration-color: rgba(17, 17, 17, .3); text-underline-offset: 4px;
+    transition: text-decoration-color .2s;
+}
+.ig-more:hover { text-decoration-color: var(--ig-ink); }
+
+/* MINIMAL — title, one line of context, the painting, name + arrows */
+.ig-min {
+    width: 100%; max-width: 520px; margin: 0 auto; padding: 0;
+    color: var(--ig-ink); font-family: 'Inter Tight', 'Helvetica Neue', Arial, sans-serif;
+}
+.ig-min .ig-title { margin: 0; font-weight: 400; letter-spacing: -.02em; font-size: 1.35rem; line-height: 1.2; }
+.ig-min .ig-intro { margin: 8px 0 0; font-size: .92rem; line-height: 1.6; color: var(--ig-soft); }
+.ig-min .ig-carousel { margin-top: 24px; }
+.ig-min .ig-stage { max-height: 58vh; }
+.ig-min .ig-bar { justify-content: space-between; margin-top: 12px; gap: 12px; }
+.ig-min .ig-name, .ig-min .ig-count {
+    font-family: 'Space Mono', ui-monospace, Menlo, monospace; font-size: .74rem; color: var(--ig-soft);
+}
+.ig-min .ig-name { color: var(--ig-ink); }
+.ig-nav { display: inline-flex; align-items: center; gap: 10px; }
+.ig-min .ig-arrow {
+    width: auto; height: auto; border: 0; border-radius: 0; padding: 2px 4px;
+    font-size: .95rem; color: var(--ig-ink); opacity: .5; transition: opacity .2s;
+}
+.ig-min .ig-arrow:hover { opacity: 1; }
+.ig-min .ig-more { margin-top: 14px; font-size: .85rem; }
+
+/* IG ROW — same layout as the other paintings (Chromatic Journey) */
+.ig-row .ig-imagecol { flex: 1; max-width: 440px; min-width: 0; }
+.ig-row .ig-carousel { margin: 0; }
+.ig-row .ig-stage { aspect-ratio: 1 / 1; max-height: none; }
+.ig-row .ig-slide img { box-shadow: 0 8px 32px rgba(0,0,0,0.1); border-radius: 2px; }
+.ig-row .ig-bar { justify-content: space-between; margin-top: 14px; gap: 12px; }
+.ig-row .ig-name { font-family: 'Space Mono', ui-monospace, Menlo, monospace; font-size: .74rem; color: #111; }
+.ig-row .ig-count { font-family: 'Space Mono', ui-monospace, Menlo, monospace; font-size: .74rem; color: #77736c; }
+.ig-row .ig-arrow {
+    width: auto; height: auto; border: 0; border-radius: 0; padding: 2px 4px; background: none;
+    font-size: .95rem; color: #111; opacity: .5; transition: opacity .2s; cursor: pointer;
+}
+.ig-row .ig-arrow:hover { opacity: 1; }
+@media (max-width: 900px) { .ig-row .ig-imagecol { max-width: none; width: 100%; } }
+
+/* IG DIST — the caption distribution; the rows of the painting on screen are in full ink */
+.ig-dist { list-style: none; margin: 18px 0; padding: 0; display: grid; gap: 8px; }
+.ig-dist li { display: flex; align-items: baseline; gap: 14px; color: #9a968f; transition: color .3s; }
+.ig-dist li.is-on { color: #111; }
+.ig-dist b {
+    flex: none; width: 3.2em;
+    font-family: 'Space Mono', ui-monospace, Menlo, monospace; font-size: .85rem; font-weight: 700;
+}
+.ig-dist span { font-size: .95rem; line-height: 1.5; }
+
+/* IG DIST SENTENCES — "1/10 captions are about…" as plain sentences */
+.ig-dist li { display: block; font-size: .95rem; line-height: 1.5; }
+.ig-dist b { width: auto; font-family: inherit; font-size: inherit; font-weight: 700; }

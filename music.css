@@ -1,0 +1,132 @@
+/* ═══════════════════════════════════════════════════
+   MUSIC — simple and modern: white page, light type,
+   four bare icons, the player as it is.
+═══════════════════════════════════════════════════ */
+#music {
+    --mu-paper: #ffffff;
+    --mu-ink: #111111;
+    --mu-soft: #77736c;
+    --mu-display: 'Inter Tight', 'Helvetica Neue', Arial, sans-serif;
+    --mu-mono: 'Space Mono', ui-monospace, Menlo, monospace;
+    background: var(--mu-paper); color: var(--mu-ink);
+    font-family: var(--mu-display);
+    padding: 0; min-height: 100vh;
+}
+#music .mu-page {
+    max-width: 1180px; margin: 0 auto;
+    min-height: 100vh; min-height: 100svh;
+    padding: 96px max(16px, 5vw) 56px;
+    display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(32px, 6vw, 96px); align-items: center;
+}
+#music .mu-text { min-width: 0; max-width: 32em; }
+
+#music .mu-label {
+    margin: 0 0 16px;
+    font-family: var(--mu-mono); font-size: .72rem; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--mu-soft);
+}
+#music .mu-title {
+    font-weight: 300; letter-spacing: -.035em; line-height: 1.02; margin: 0;
+    font-size: clamp(2.2rem, 5vw, 4.4rem); text-wrap: balance;
+}
+#music .mu-mark { font-weight: 500; }
+#music .mu-bio { margin-top: clamp(18px, 3vh, 28px); display: grid; gap: 10px; }
+#music .mu-bio p { margin: 0; font-size: 1rem; line-height: 1.65; color: #2b2b2b; }
+
+/* streaming icons: bare, same width, evenly spaced */
+#music .mu-links { display: flex; align-items: center; gap: 30px; margin-top: clamp(24px, 4vh, 36px); }
+#music .mu-links a { display: block; padding: 4px 0; opacity: .85; transition: opacity .2s, transform .2s; }
+#music .mu-links img { display: block; width: 26px; height: auto; }
+#music .mu-links a:hover { opacity: 1; transform: translateY(-3px); }
+#music .mu-links a:focus-visible { outline: 2px solid var(--mu-ink); outline-offset: 4px; }
+
+/* player */
+#music .mu-player { min-width: 0; }
+#music .mu-sticker {
+    display: block; margin: 0 0 12px;
+    font-family: var(--mu-mono); font-size: .72rem; text-transform: uppercase; letter-spacing: .08em;
+    color: var(--mu-soft);
+}
+#music .mu-player iframe {
+    display: block; width: 100%; height: 352px;
+    border: 0; border-radius: 12px; background: #f1efeb;
+}
+
+@media (max-width: 860px) {
+    #music .mu-page { grid-template-columns: 1fr; padding-top: 88px; align-content: start; }
+}
+
+/* ALBUM BANNER — one flat blue-violet band under the menu */
+#music { --mu-violet: #3b2fd4; --mu-violet-dark: #2c22a8; }
+#music .mu-album {
+    display: flex; align-items: center; gap: clamp(14px, 2.5vw, 28px);
+    width: min(calc(1180px - 2 * max(16px, 5vw)), calc(100% - 2 * max(16px, 5vw)));
+    margin: 84px auto 0;
+    padding: 14px clamp(14px, 2.5vw, 28px) 14px 14px;
+    background: var(--mu-violet); color: #fff; text-decoration: none;
+    border-radius: 14px; transition: background .2s;
+}
+#music .mu-album:hover { background: var(--mu-violet-dark); }
+#music .mu-album:focus-visible { outline: 2px solid var(--mu-violet); outline-offset: 3px; }
+#music .mu-album img { width: clamp(64px, 8vw, 92px); height: auto; border-radius: 8px; flex: none; display: block; }
+#music .mu-album-text { display: flex; flex-direction: column; gap: 4px; min-width: 0; flex: 1 1 auto; }
+#music .mu-album-label {
+    font-family: var(--mu-mono); font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; opacity: .75;
+}
+#music .mu-album-title { font-weight: 300; letter-spacing: -.02em; line-height: 1.1; font-size: clamp(1.25rem, 2.6vw, 2rem); }
+#music .mu-album-cta {
+    flex: none; font-size: .95rem; padding: 10px 16px; border: 1px solid rgba(255,255,255,.55); border-radius: 999px;
+    transition: background .2s, color .2s;
+}
+#music .mu-album:hover .mu-album-cta { background: #fff; color: var(--mu-violet-dark); }
+
+/* the two columns no longer need to fill the screen */
+#music .mu-page { min-height: 0; padding-top: clamp(36px, 7vh, 72px); padding-bottom: 0; }
+
+/* platforms, centred under everything */
+#music .mu-platforms {
+    max-width: 1180px; margin: clamp(48px, 9vh, 96px) auto 0;
+    padding: 0 max(16px, 5vw) clamp(56px, 10vh, 104px);
+    text-align: center;
+}
+#music .mu-platforms p {
+    margin: 0 0 18px; font-family: var(--mu-mono); font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; color: var(--mu-ink);
+}
+#music .mu-platforms .mu-links { justify-content: center; margin-top: 0; gap: 36px; }
+
+@media (max-width: 640px) {
+    #music .mu-album { flex-wrap: wrap; }
+    #music .mu-album-cta { width: 100%; text-align: center; }
+}
+
+/* ONE SCREEN — slimmer banner, everything fits without scrolling */
+#music { min-height: 0; }
+#music .mu-album { margin-top: 72px; padding: 8px 14px 8px 8px; gap: 14px; border-radius: 10px; }
+#music .mu-album img { width: 44px; border-radius: 6px; }
+#music .mu-album-text { flex-direction: row; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+#music .mu-album-title { font-size: clamp(1rem, 1.6vw, 1.2rem); }
+#music .mu-album-cta { font-size: .85rem; padding: 6px 12px; }
+#music .mu-page { padding-top: clamp(20px, 4vh, 44px); }
+#music .mu-title { font-size: clamp(2rem, min(4.4vw, 7vh), 4rem); }
+#music .mu-bio { margin-top: clamp(12px, 2.4vh, 24px); }
+#music .mu-player iframe { height: clamp(232px, 40vh, 352px); }
+#music .mu-platforms { margin-top: clamp(20px, 4.5vh, 56px); padding-bottom: clamp(20px, 4vh, 48px); }
+#music .mu-platforms p { margin-bottom: 12px; }
+@media (max-width: 640px) {
+    #music .mu-album-text { flex-direction: column; gap: 2px; }
+    #music .mu-album-cta { width: auto; }
+    #music .mu-album { flex-wrap: nowrap; }
+}
+
+/* PLAYER HEIGHT — Spotify only fills its box at 352px (full) or 152px (compact) */
+#music .mu-player iframe { height: 352px; background: transparent; }
+@media (max-height: 760px) and (min-width: 861px) { #music .mu-player iframe { height: 152px; } }
+
+/* MORE AIR — more room between the banner, the two columns and the platforms */
+#music .mu-album { margin-top: 84px; }
+#music .mu-page { padding-top: clamp(32px, 7vh, 72px); column-gap: clamp(48px, 9vw, 140px); }
+#music .mu-bio { margin-top: clamp(18px, 3.2vh, 32px); gap: 14px; }
+#music .mu-sticker { margin-bottom: 16px; }
+#music .mu-platforms { margin-top: clamp(36px, 7vh, 80px); padding-bottom: clamp(32px, 6vh, 64px); }
+#music .mu-platforms p { margin-bottom: 18px; }

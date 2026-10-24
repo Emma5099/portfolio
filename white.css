@@ -1,0 +1,75 @@
+/* ═══════════════════════════════════════════════════
+   WHITE — every tab on a white page, ink black text.
+   Loaded after style.css; overrides the old dark/lavender theme.
+═══════════════════════════════════════════════════ */
+:root {
+    --w-paper: #ffffff;
+    --w-ink: #141414;
+    --w-ink-soft: #6d6a64;
+    --w-line: rgba(20, 20, 20, .14);
+    --w-spot: #ec4a2b;
+}
+
+body.dark-theme,
+body.light-theme,
+.dark-section,
+.light-section,
+#about, #music, #ai-art, #paint, #articles {
+    background-color: var(--w-paper);
+    color: var(--w-ink);
+}
+body header,
+body.dark-theme header { background-color: var(--w-paper); }
+body.dark-theme nav a,
+body.paint-tab nav a { color: var(--w-ink); }
+body.dark-theme nav a.active,
+body.dark-theme nav a:hover,
+body.paint-tab nav a.active,
+body.paint-tab nav a:hover { color: #000; }
+body.dark-theme .bar { background: var(--w-ink); }
+
+/* About */
+.about-heading { color: var(--w-ink); }
+.about-text-col p { color: #2a2a2a; }
+.about-contact-links a { color: var(--w-ink); }
+.about-contact-links a:hover { color: #000; }
+.about-portrait-caption { color: var(--w-ink-soft); }
+.about-profile-img { box-shadow: none; }
+
+/* Music */
+.music-bio, .music-bio p { color: #2a2a2a; }
+
+/* AI */
+.ai-project-desc-col,
+.ai-project-item--purple .ai-project-desc-col { color: #2a2a2a; }
+.ai-project-item--purple .ai-project-desc-col strong { color: var(--w-ink); }
+.ai-project-title,
+.ai-project-item--purple .ai-project-title { color: var(--w-ink); }
+.ai-project-tag,
+.ai-project-item--purple .ai-project-tag {
+    color: var(--w-ink-soft);
+    font-family: 'Space Mono', ui-monospace, monospace;
+}
+.ai-project-item--purple .article-link-pill { color: var(--w-ink); border-color: var(--w-ink); }
+.ai-project-item--purple .article-link-pill:hover { color: #000; }
+.ai-inline-link,
+.ai-project-item--purple .ai-inline-link { color: var(--w-ink); }
+.ai-inline-link:hover,
+.ai-project-item--purple .ai-inline-link:hover { color: var(--w-spot); }
+.ai-project-gif,
+.ai-project-item--purple .ai-project-gif { border-color: var(--w-line); background: var(--w-paper); }
+.ai-project-video-wrap { box-shadow: none; }
+.ai-profile-link img { filter: brightness(0); }
+.ai-profile-link span { color: var(--w-ink); }
+.resource-card { background: transparent; border-color: var(--w-line); }
+.resource-card:hover { background: rgba(20,20,20,.03); border-color: var(--w-ink); }
+.resource-info h4, .resource-card:hover .resource-arrow { color: var(--w-ink); }
+.resource-info p, .resource-arrow, .ai-social-link { color: var(--w-ink-soft); }
+.ai-social-link:hover { color: var(--w-ink); }
+.ai-hero-scroll { color: var(--w-ink-soft); }
+
+/* Lightbox */
+.lightbox { background: rgba(255, 255, 255, .97); }
+.lightbox-close, .lightbox-caption { color: var(--w-ink); }
+.lightbox-close:hover { color: #000; }
+.lightbox-img { box-shadow: none; }
